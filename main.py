@@ -3,7 +3,6 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from math import radians, cos, sin, sqrt, atan2
-import uvicorn
 import heapq
 
 app = FastAPI()
@@ -127,7 +126,3 @@ def calcular_caracteristicas(request: Request, destino: str = Form(...), paquete
             "paquetes": paquetes
         }
     })
-
-if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8000)
-
