@@ -1,17 +1,8 @@
-from fastapi import FastAPI, Request, Form
-from fastapi.responses import HTMLResponse
-from fastapi.templating import Jinja2Templates
-from fastapi.staticfiles import StaticFiles
+from flask import Flask, render_template, request
 from math import radians, cos, sin, sqrt, atan2
 import heapq
 
-app = FastAPI()
-
-# Configuración de las plantillas
-templates = Jinja2Templates(directory="templates")
-
-# Configuración para archivos estáticos (si es necesario)
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app = Flask(__name__)
 
 # Diccionario de coordenadas
 coordenadas = {
@@ -85,25 +76,22 @@ def dijkstra(grafo, inicio, destino):
     ruta_final = camino[destino] + [destino]
     return ruta_final, distancias[destino]
 
-@app.get("/", response_class=HTMLResponse)
-def mostrar_formulario(request: Request):
-    return templates.TemplateResponse("index.html", {
-        "request": request,
-        "ciudades": list(coordenadas.keys())
-    })
+# Ruta principal para cargar la página web
+@app.route('/')
+def index():
+    return render_template("index.html", ciudades=list(coordenadas.keys()))
 
-@app.post("/caracteristicas", response_class=HTMLResponse)
-def calcular_caracteristicas(request: Request, destino: str = Form(...), paquetes: int = Form(...)):
+# Ruta para calcular la ruta más corta
+@app.route('/caracteristicas', methods=['POST'])
+def caracteristicas():
+    destino = request.form['destino']
+    paquetes = int(request.form['paquetes'])
     almacen = 'CDMX'  # Ciudad de inicio
     peso_maximo = 40  # Peso máximo del automóvil
 
     # Verificar si el peso de los paquetes excede el límite
     if paquetes > peso_maximo:
-        return templates.TemplateResponse("index.html", {
-            "request": request,
-            "ciudades": list(coordenadas.keys()),
-            "error": "El peso máximo del automóvil es de 40 unidades."
-        })
+        return render_template("index.html", ciudades=list(coordenadas.keys()), error="El peso máximo del automóvil es de 40 unidades.")
 
     # Calcular la ruta más corta usando Dijkstra
     ruta, distancia_total = dijkstra(grafo, almacen, destino)
@@ -114,15 +102,14 @@ def calcular_caracteristicas(request: Request, destino: str = Form(...), paquete
     combustible_total = distancia_total * 0.2  # Suponemos 0.2 litros/km
 
     # Mostrar el resultado
-    return templates.TemplateResponse("index.html", {
-        "request": request,
-        "ciudades": list(coordenadas.keys()),
-        "resultado": {
-            "ruta": ruta,
-            "distancia": round(distancia_total, 2),
-            "tiempo": round(tiempo_total, 2),
-            "combustible": round(combustible_total, 2),
-            "destino": destino,
-            "paquetes": paquetes
-        }
+    return render_template("index.html", ciudades=list(coordenadas.keys()), resultado={
+        "ruta": ruta,
+        "distancia": round(distancia_total, 2),
+        "tiempo": round(tiempo_total, 2),
+        "combustible": round(combustible_total, 2),
+        "destino": destino,
+        "paquetes": paquetes
     })
+
+if __name__ == '__main__':
+    app.run(debug=True)  
