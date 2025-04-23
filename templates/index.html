@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ruta</title>
+    <!-- Vincular el archivo CSS -->
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <h1>Destino y Paquetes</h1>
+    <form action="/caracteristicas" method="post">
+        <label for="destino">Ciudad de destino:</label>
+        <select name="destino" id="destino">
+            {% for ciudad in ciudades %}
+                <option value="{{ ciudad }}">{{ ciudad }}</option>
+            {% endfor %}
+        </select><br><br>
+
+        <label for="paquetes">Paquetes:</label>
+        <input type="number" name="paquetes" id="paquetes" required><br><br>
+
+        <button type="submit">Caracteristicas</button>
+    </form>
+
+    {% if resultado %}
+    <h2>Resultados:</h2>
+    <p>Ruta: {{ resultado.ruta }}</p>
+    <p>Distancia: {{ resultado.distancia }} km</p>
+    <p>Tiempo estimado: {{ resultado.tiempo }} horas</p>
+    <p>Combustible estimado: {{ resultado.combustible }} litros</p>
+    <p>Destino: {{ resultado.destino }}</p>
+    <p>Paquetes: {{ resultado.paquetes }}</p>
+    {% endif %}
+</body>
+</html>
