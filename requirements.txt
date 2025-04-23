@@ -1,5 +1,2 @@
-fastapi
-uvicorn
-jinja2
+Flask
 gunicorn
-python-multipart
